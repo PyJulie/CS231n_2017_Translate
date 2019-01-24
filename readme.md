@@ -1,9 +1,9 @@
 ## 01. Introduction to CNN for visual recognition
  - 首先介绍了计算机视觉从1960年代后期到2017年的一段历史。
  - 计算机视觉中存在的问题，包括图像分类（image classification)，目标定位(object localization)，目标检测(object detection)和场景理解(scene understanding)。
- - [Imagenet][http://www.image-net.org/]是目前用于图像分类的最庞大的数据集之一
+ - [Imagenet](http://www.image-net.org/)是目前用于图像分类的最庞大的数据集之一
  - 自2012年起，CNN（Convolutional neural networks，卷积神经网络）在Imagenet图像竞赛中，一直在取得优胜。
- - CNN由[Yann Lecun][http://ieeexplore.ieee.org/document/726791/]于1997年发明
+ - CNN由[Yann Lecun](http://ieeexplore.ieee.org/document/726791/)于1997年发明
 ## 02. Image classfication
  - 图像分类问题面临着光照和视角带来的诸多挑战。
  - ![](Images/39.jpeg)
