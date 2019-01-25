@@ -1,3 +1,10 @@
+## 00. Translator's speaking
+ - 大家好，很荣幸能获得原作者[Mahmoud Badry](https://github.com/mbadry1/CS231n-2017-Summary)的授权翻译这份笔记，很感谢他的工作！
+ - 怎么去使用这份笔记呢？如果想学习深度学习以及计算机视觉，只看这份笔记当然是不够的，然而之前由[Andrej Karpathy](https://cs.stanford.edu/people/karpathy/)讲授的CS231n课程，由他本人亲自整理并授权翻译的[笔记](https://zhuanlan.zhihu.com/p/20894041)对课程中的每一部分都做了很详尽的解读，甚至不需要看视频课程就可以对整个课程中讲述的知识有很全面的认识。
+ - 那为什么还需要翻译这份笔记呢？首先，先前的CS231n笔记并不完全，大概只有课程的前半部分内容，而且年代久远，毕竟计算机视觉技术日新月异，很容易注意到的就是，课程的最后还包含了当下最流行的GAN。
+ - 因此，我翻译这份笔记有以下考虑：相对于一份完整的textbook，我更希望将这个笔记作为一个完整的大纲，这样，对于适合看视频课程进行学习的同学，他可以很容易地查找到自己想要学习的部分。对于像笔者这样不喜欢看视频学习的人，可以根据笔记中所提出的一些概念，使用搜索引擎查找博文来逐个击破。
+ - 我会用尽快的时间去完成这份笔记的翻译，由于个人水平有限，如有不足之处欢迎指出。
+
 ## 01. Introduction to CNN for visual recognition
  - 首先介绍了计算机视觉从1960年代后期到2017年的一段历史。
  - 计算机视觉中存在的问题，包括图像分类（image classification)，目标定位(object localization)，目标检测(object detection)和场景理解(scene understanding)。
@@ -6,7 +13,7 @@
  - CNN由[Yann Lecun](http://ieeexplore.ieee.org/document/726791/)于1997年发明
 ## 02. Image classfication
  - 图像分类问题面临着光照和视角带来的诸多挑战。
- - ![](Images/39.jpeg)
+ - 图片
  - 图像分类问题可以使用一种叫KNN（K nearest neighborhood，K临近）的算法来解决，但事实上效果并不显著。 
 KNN的特性如下：
     - knn的超参数（hyperparameters）为：k和测量距离
@@ -31,46 +38,46 @@ KNN的特性如下：
 - 线性分类器必须运行以下方程：y=wX+b
     - W与X维度相同，B的维度为1。
 - 我们可以使向量X置1，用来消除偏差b，就有：y=wX
-    - X的维度变为X+1，w与x相同
+    - x的形状为oldx+1，w与x相同
 - 我们需要知道怎样才能得到一个最优的W和B，使我们的分类器能达到最优的分类效果。
 ## 03. Loss function and optimization
 
-- In the last section we talked about linear classifier but we didn't discussed how we could **train** the parameters of that model to get best `w`'s and `b`'s.
+- 在上一个部分中我们谈到线性分类器，但是我们没有解释怎么去**训练**参数，以便让我们的模型去学习到最佳的w和b的值。
 
-- We need a loss function to measure how good or bad our current parameters.
+- 我们需要一个loss function（损失函数）去度量我们目前参数的好坏情况。
 
   - ```python
     Loss = L[i] =(f(X[i],W),Y[i])
     Loss_for_all = 1/N * Sum(Li(f(X[i],W),Y[i]))      # Indicates the average
     ```
 
-- Then we find a way to minimize the loss function given some parameters. This is called **optimization**.
+- 接着我们使用一种名为**optimization**（优化）的方法，找到一些适用于损失函数的参数，让我们的损失最小化。
 
-- Loss function for a linear **SVM** classifier:
+- 用于**SVM**的损失函数:
 
-  - `L[i] = Sum where all classes except the predicted class (max(0, s[j] - s[y[i]] + 1))`
-  - We call this ***the hinge loss***.
-  - Loss function means we are happy if the best prediction are the same as the true value other wise we give an error with 1 margin.
+  - `L[i] = 除预测类之外所有类别的总和 (max(0, s[j] - s[y[i]] + 1))`
+  - 我们把这叫做***hinge loss***.
+  - 损失函数意味着如果预测值和真实值相同，那就是最佳情况，不然我们就需要赋上一个margin为1的误差。
   - Example:
     - ![](Images/40.jpg)
-    - Given this example we want to compute the loss of this image.
+    - 我们用这个例子来看看如何计算损失函数以及其用途。
     - `L = max (0, 437.9 - (-96.8) + 1) + max(0, 61.95 - (-96.8) + 1) = max(0, 535.7) + max(0, 159.75) = 695.45`
-    - Final loss is 695.45 which is big and reflects that the cat score needs to be the best over all classes as its the lowest value now. We need to minimize that loss.
-  - Its OK for the margin to be 1. But its a hyperparameter too.
+    - 最终的损失值为695.45，这个数值相当大，再来看我们的预测值，猫的得分最低，所以我们就需要优化我们的损失值，使其在猫的得分最高。
+  - margin为1是可取的一个值，同时它也是一个超参数。
 
-- If your loss function gives you zero, are this value is the same value for your parameter? No there are a lot of parameters that can give you best score.
+- 如果损失函数计算出当前的损失值为1，那么是否就说明当前的参数就是最佳的呢？当然不是，请记住，超参数可以是很多个不同的组合，这些组合都可能让某一个类别的损失值为0，你需要找到让你的模型对所有预测都有一个较高的水准的参数。
 
-- You’ll sometimes hear about people instead using the squared hinge loss SVM (or L2-SVM). that penalizes violated margins more strongly (quadratically instead of linearly). The unsquared version is more standard, but in some datasets the squared hinge loss can work better.
+- 你可能会听过有时人们会使用squared hinge loss SVM (或L2-SVM)这种损失函数。 这样会对错分的惩罚更加大（查一下两者公式的异同，你应该会明白为什么会这样）。hinge loss的确很常用，但在某些数据集中，squared hinge loss效果会更好，这就依赖于我们长久以往的调参经验了。
 
-- We add **regularization** for the loss function so that the discovered model don't overfit the data.
+- 我们通常会在损失函数中加入 **regularization（正则化）**项以防让我们的模型对数据**过拟合**。
 
   - ```python
     Loss = L = 1/N * Sum(Li(f(X[i],W),Y[i])) + lambda * R(W)
     ```
 
-  - Where `R` is the regularizer, and `lambda` is the regularization term.
+  -  `R` 就是我们所说的正则化项,  `lambda` 是正则系数。
 
-- There are different regularizations techniques:
+- 下面是一些不同的正则化方法:
 
   - | Regularizer           | Equation                            | Comments               |
     | --------------------- | ----------------------------------- | ---------------------- |
@@ -79,19 +86,19 @@ KNN的特性如下：
     | Elastic net (L1 + L2) | `R(W) = beta * Sum(W^2) + Sum(lWl)` |                        |
     | Dropout               |                                     | No Equation            |
 
-- Regularization prefers smaller `W`s over big `W`s.
+- 正则化更倾向于较小的`W`
 
-- Regularizations is called weight decay. biases should not included in regularization.
+- 正则化也叫weight decay（权重衰减），正则化中不应该包含biases。
 
-- Softmax loss (Like linear regression but works for more than 2 classes):
+- Softmax loss (和线性回归相似，但可作用于多分类):
 
-  - Softmax function:
+  - Softmax函数:
 
     - ```python
       A[L] = e^(score[L]) / sum(e^(score[L]), NoOfClasses)
       ```
 
-  - Sum of the vector should be 1.
+  - 对每一个分类最终获得的分值，其和应为1。
 
   - Softmax loss:
 
@@ -99,11 +106,11 @@ KNN的特性如下：
       Loss = -logP(Y = y[i]|X = x[i])
       ```
 
-    - Log of the probability of the good class. We want it to be near 1 thats why we added a minus.
+    - log函数在输入小于1的时候是个负数，而且log函数是递增函数，例如-log(0.6) < -log(0.3) < -log(0.1)。简单讲就是你预测错比预测对的损失要大，预测错得离谱比预测错得轻微的损失要大。
 
-    - Softmax loss is called cross-entropy loss.
+    - Softmax loss又叫cross-entropy（交叉熵）loss.
 
-  - Consider this numerical problem when you are computing Softmax:
+  - 请思考以下数值计算问题:
 
     - ```python
       f = np.array([123, 456, 789]) # example with 3 classes and each having large scores
@@ -116,27 +123,27 @@ KNN的特性如下：
 
 - **Optimization**:
 
-  - How we can optimize loss functions we discussed?
-  - Strategy one:
-    - Get a random parameters and try all of them on the loss and get the best loss. But its a bad idea.
-  - Strategy two:
-    - Follow the slope.
+  - 我们如何去优化损失函数?
+  - 方案一：
+    - 我们随机初始化一些参数，重复成千上万次，在中找到一个最好的结果。很显然，这样做是很蠢的。
+  - 方案二：
+    
       - ![](Images/41.png)
-      - Image [source](https://rasbt.github.io/mlxtend/user_guide/general_concepts/gradient-optimization_files/ball.png).
+      - 图像 [来源](https://rasbt.github.io/mlxtend/user_guide/general_concepts/gradient-optimization_files/ball.png).
 
-    - Our goal is to compute the gradient of each parameter we have.
-      - **Numerical gradient**: Approximate, slow, easy to write.   (But its useful in debugging.)
-      - **Analytic gradient**: Exact, Fast, Error-prone.   (Always used in practice)
+    - 我们的目标是计算每个参数的梯度。
+      - **数值梯度**: 比较慢，是近似值，并且比较容易。
+      - **Analytic gradient**: 比较快，是精确值，但是容易犯错，需要微积分的知识。
 
     - After we compute the gradient of our parameters, we compute the gradient descent:
       - ```python
         W = W - learning_rate * W_grad
         ```
 
-    - learning_rate is so important hyper parameter you should get the best value of it first of all the hyperparameters.
+    - learning_rate（学习速率）十分重要，我们需要在训练的最开始就确定好它的值。
 
-    - stochastic gradient descent:
-      - Instead of using all the date, use a mini batch of examples (32/64/128 are commonly used) for faster results.
+    - SGD（stochastic gradient descent，随机梯度下降）:
+      -  不要使用所有数据，而是使用一小批抽样数据（通常使用32/64/128）以获得更快的结果。 
 
 
 
@@ -2007,3 +2014,7 @@ KNN的特性如下：
 - There are a Github code that can make you learn everything about adversarial by code (Built above tensorflow):
   - An adversarial example library for constructing attacks, building defenses, and benchmarking both: https://github.com/tensorflow/cleverhans
 
+
+  [1]: http://www.image-net.org/
+  [2]: http://ieeexplore.ieee.org/document/726791/
+  [3]: https://github.com/mbadry1/CS231n-2017-Summary/blob/master/Images/39.jpeg
