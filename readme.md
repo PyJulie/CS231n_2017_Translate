@@ -1,11 +1,11 @@
-## 00. Translator's speaking
+## 00. 作者的话 Translator's speaking
  - 大家好，很荣幸能获得原作者[Mahmoud Badry](https://github.com/mbadry1/CS231n-2017-Summary)的授权翻译这份笔记，很感谢他的工作！
  - 怎么去使用这份笔记呢？如果想学习深度学习以及计算机视觉，只看这份笔记当然是不够的，然而之前由[Andrej Karpathy](https://cs.stanford.edu/people/karpathy/)讲授的CS231n课程，由他本人亲自整理并授权翻译的[笔记](https://zhuanlan.zhihu.com/p/20894041)对课程中的每一部分都做了很详尽的解读，甚至不需要看视频课程就可以对整个课程中讲述的知识有很全面的认识。
  - 那为什么还需要翻译这份笔记呢？首先，先前的CS231n笔记并不完全，大概只有课程的前半部分内容，而且年代久远，毕竟计算机视觉技术日新月异，很容易注意到的就是，课程的最后还包含了当下最流行的GAN。
  - 因此，我翻译这份笔记有以下考虑：相对于一份完整的textbook，我更希望将这个笔记作为一个完整的大纲，这样，对于适合看视频课程进行学习的同学，他可以很容易地查找到自己想要学习的部分。对于像笔者这样不喜欢看视频学习的人，可以根据笔记中所提出的一些概念，使用搜索引擎查找博文来逐个击破。
  - 我会用尽快的时间去完成这份笔记的翻译，由于个人水平有限，如有不足之处欢迎指出。
 
-## 01. Introduction to CNN for visual recognition
+## 01. CNN在计算机视觉中的应用 Introduction to CNN for visual recognition
  - 首先介绍了计算机视觉从1960年代后期到2017年的一段历史。
  - 计算机视觉中存在的问题，包括图像分类（image classification)，目标定位(object localization)，目标检测(object detection)和场景理解(scene understanding)。
  - [Imagenet](http://www.image-net.org/)是目前用于图像分类的最庞大的数据集之一
@@ -135,12 +135,12 @@ KNN的特性如下：
       - **数值梯度**: 比较慢，是近似值，并且比较容易。
       - **Analytic gradient**: 比较快，是精确值，但是容易犯错，需要微积分的知识。
 
-    - After we compute the gradient of our parameters, we compute the gradient descent:
+    - 计算出梯度的值，使用原来的权重值减去learning_rate（学习速率）×梯度值，就得到了新的权重
       - ```python
         W = W - learning_rate * W_grad
         ```
 
-    - learning_rate（学习速率）十分重要，我们需要在训练的最开始就确定好它的值。
+    - 学习速率十分重要，我们需要在训练的最开始就确定好它的值。
 
     - SGD（stochastic gradient descent，随机梯度下降）:
       -  不要使用所有数据，而是使用一小批抽样数据（通常使用32/64/128）以获得更快的结果。 
@@ -148,20 +148,20 @@ KNN的特性如下：
 
 
 
-## 04. Introduction to Neural network
+## 04. 神经网络介绍 Introduction to Neural network
 
-- Computing the analytic gradient for arbitrary complex functions:
+- 计算任意复杂函数的Analytic gradient:
 
-  - What is a Computational graphs?
+  - 什么是Computational Graphs（计算图）?
 
-    - Used to represent any function. with nodes.
-    - Using Computational graphs can easy lead us to use a technique that called back-propagation. Even with complex models like CNN and RNN.
+    - 可以将计算图看作是一种用来描述function的语言，图中的节点node代表function的输入（可以是常数、向量、张量等），图中的边代表这个function操作。 
+    - 使用计算图可以很容易地使用一种名叫Back-propagation（反向传播）的技术。 即使是像CNN和RNN这样的复杂模型。
 
-  - Back-propagation simple example:
+  - 反向传播的一个简单例子:
 
-    - Suppose we have `f(x,y,z) = (x+y)z`
+    - 假设我们有这样一个函数 `f(x,y,z) = (x+y)z`
 
-    - Then graph can be represented this way:
+    - 可以这样表示计算图:
 
     - ```
       X         
@@ -174,34 +174,29 @@ KNN的特性如下：
       Z---------/
       ```
 
-    - We made an intermediate variable `q`  to hold the values of `x+y`
+    - 我们使用了一个intermediate（中继）变量 `q`  来保存 `x+y` 的值
 
-    - Then we have:
+    - 接下来:
 
       - ```python
         q = (x+y)              # dq/dx = 1 , dq/dy = 1
         f = qz                 # df/dq = z , df/dz = q
-        ```
-
-    - Then:
-
-      - ```python
         df/dq = z
         df/dz = q
         df/dx = df/dq * dq/dx = z * 1 = z       # Chain rule
         df/dy = df/dq * dq/dy = z * 1 = z       # Chain rule
         ```
 
-  - So in the Computational graphs, we call each operation `f`. For each `f` we calculate the local gradient before we go on back propagation and then we compute the gradients in respect of the loss function using the chain rule.
+  - 因此在计算图中，我们称每个操作为 `f`。对于每个`f`，我们在进行反向传播之前计算局部梯度，然后使用链式法则计算损失函数的梯度。
 
-  - In the Computational graphs you can split each operation to as simple as you want but the nodes will be a lot. if you want the nodes to be smaller be sure that you can compute the gradient of this node.
+  - 在计算图中，你可以将每个操作拆分成许多更小更简单的操作，但节点也会变得很多繁杂。如果节点功能简化是你所希望的，请确保这个节点上的梯度是可计算的。
 
-  - A bigger example:
+  - 一个更直观的例子:
 
     - ![](Images/01.png)
-    - Hint: the back propagation of two nodes going to one node from the back is by adding the two derivatives.
+    - 提示：两个节点反向传播到后一个节点上，则需要添加两个导数。
 
-  - Modularized implementation: forward/ backward API (example multiply code):
+  - 模块化实现：前向传播/后向传播API（示例中的乘法代码）:
 
     - ```python
       class MultuplyGate(object):
@@ -220,7 +215,7 @@ KNN的特性如下：
           return [dx, dy]
       ```
 
-  - If you look at a deep learning framework you will find it follow the Modularized implementation where each class has a definition for forward and backward. For example:
+  - 当你使用一个深度学习框架时，你会发现它们的功能都是模块化封装好的，其中每个类都有前向和后向的定义。 例如：
 
     - Multiplication
     - Max
@@ -229,112 +224,113 @@ KNN的特性如下：
     - Sigmoid
     - Convolution
 
-- So to define neural network as a function:
+- 将神经网络构为函数:
 
-  - (Before) Linear score function: `f = Wx`
-  - (Now) 2-layer neural network:    `f = W2*max(0,W1*x)` 
-    - Where max is the RELU non linear function
-  - (Now) 3-layer neural network:    `f = W3*max(0,W2*max(0,W1*x)`
-  - And so on..
+  - (before) 线性分类函数: `f = Wx`
+  - (Now) 两层神经网络:    `f = W2*max(0,W1*x)` 
+    - 其中max是RELU非线性函数
+  - (Now) 三层神经网络:    `f = W3*max(0,W2*max(0,W1*x)`
+  - 等等..
 
-- Neural networks is a stack of some simple operation that forms complex operations.
+- 神经网络本质上是将许多简单的操作组在一起，以便帮我们完成一些复杂的功能。（感兴趣的朋友们可以查阅为什么神经网络可以拟合一切函数）
 
 
 
-## 05. Convolutional neural networks (CNNs)
+## 05. 卷及神经网络 Convolutional neural networks (CNNs)
 
-- Neural networks history:
-  - First perceptron machine was developed by Frank Rosenblatt in 1957. It was used to recognize letters of the alphabet. Back propagation wasn't developed yet.
-  - Multilayer perceptron was developed in 1960 by Adaline/Madaline. Back propagation wasn't developed yet.
-  - Back propagation was developed in 1986 by Rumeelhart.
-  - There was a period which nothing new was happening with NN. Cause of the limited computing resources and data.
+- 神经网络的历史:
+  - 第一台感知机（就是现在的神经网络）是Frank Rosenblatt于1957年发明的。它被用于识别字母表中的字母。
+  - 多层感知器是由Adaline / Madaline于1960年发明的。当时反向传播还没有被发明出来。
+  - Rumeelhart于1986年提出了反向传播。
+  - 有这么一段时间，关于NN的研究没有任何的进展，这主要是因为当时的计算资源和数据量都十分有限。
   - In [2006](www.cs.toronto.edu/~fritz/absps/netflix.pdf) Hinton released a paper that shows that we can train a deep neural network using Restricted Boltzmann machines to initialize the weights then back propagation.
-  - The first strong results was in 2012 by Hinton in [speech recognition](http://ieeexplore.ieee.org/document/6296526/). And the [Alexnet](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) "Convolutional neural networks" that wins the image net in 2012 also by Hinton's team.
-  - After that NN is widely used in various applications.
-- Convolutional neural networks history:
-  - Hubel & Wisel in 1959 to 1968 experiments on cats cortex found that there are a topographical mapping in the cortex and that the neurons has hireical organization from simple to complex.
-  - In 1998, Yann Lecun gives the paper [Gradient-based learning applied to document recognition](http://ieeexplore.ieee.org/document/726791/) that introduced the Convolutional neural networks. It was good for recognizing zip letters but couldn't run on a more complex examples.
-  - In 2012 [AlexNet](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) used the same Yan Lecun architecture and won the image net challenge. The difference from 1998 that now we have a large data sets that can be used also the power of the GPUs solved a lot of performance problems.
-  - Starting from 2012 there are CNN that are used for various tasks (Here are some applications):
-    - Image classification.
-    - Image retrieval.
-      - Extracting features using a NN and then do a similarity matching.
-    - Object detection.
-    - Segmentation.
-      - Each pixel in an image takes a label.
-    - Face recognition.
-    - Pose recognition.
-    - Medical images.
-    - Playing Atari games with reinforcement learning.
-    - Galaxies classification.
-    - Street signs recognition.
-    - Image captioning.
-    - Deep dream.
-- ConvNet architectures make the explicit assumption that the inputs are images, which allows us to encode certain properties into the architecture.
-- There are a few distinct types of Layers in ConvNet (e.g. CONV/FC/RELU/POOL are by far the most popular)
-- Each Layer may or may not have parameters (e.g. CONV/FC do, RELU/POOL don’t)
-- Each Layer may or may not have additional hyperparameters (e.g. CONV/FC/POOL do, RELU doesn’t)
-- How Convolutional neural networks works?
-  - A fully connected layer is a layer in which all the neurons is connected. Sometimes we call it a dense layer.
-    - If input shape is `(X, M)` the weighs shape for this will be `(NoOfHiddenNeurons, X)`
-  - Convolution layer is a layer in which we will keep the structure of the input by a filter that goes through all the image.
-    - We do this with dot product: `W.T*X + b`. This equation uses the broadcasting technique.
-    - So we need to get the values of `W` and `b`
-    - We usually deal with the filter (`W`) as a vector not a matrix.
-  - We call output of the convolution activation map. We need to have multiple activation map.
-    - Example if we have 6 filters, here are the shapes:
+  - 2012年Hinton第一次有重大成果 [speech recognition](http://ieeexplore.ieee.org/document/6296526/). And the [Alexnet](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf) "Convolutional neural networks" 帮助Hinto的队伍赢得了2012年的Imagenet竞赛。
+  - 从那以后，NN就开始被广泛应用于各种场景中。
+- 卷积神经网络历史:
+  - 1959年到1968年Hubel 和 Wisel 在对猫皮质的实验中发现，皮层中存在一些地形图，神经元有着从简单到复杂的层次结构。
+  - 1998年, Yann Lecun发表的论文 [Gradient-based learning applied to document recognition](http://ieeexplore.ieee.org/document/726791/) 提出了卷积神经网络。它很适合识别压缩字母但在一些复杂例子中似乎并不有效。
+  - 2012年 [AlexNet](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)使用了相同的架构并赢得了Imagenet大赛。与1998年不同的是，现在我们拥有大量数据集，并可以使用GPU强大的计算能力解决了很多性能问题。
+  - 从2012年开始，卷及神经网络被用于各种领域，包括：
+    - 图像分类
+    - 图像检索
+      - 使用NN提取特征，然后进行相似性匹配。
+    - 物体检测
+    - 分割
+      - 图像中的每一个像素都拥有一个类别标签。
+    - 人脸检测
+    - 体态检测
+    - 医疗图像
+    - 使用强化学习进行Atari游戏
+    - 星系分类
+    - 街道图标识别
+    - 图像描述
+    - Deep dream（风格迁移）
+- ConvNet架构明确假设输入是图像，这允许我们将某些属性编码到架构中。
+- ConvNet中有许多不同的层 (例如这些最常用的 CONV/FC/RELU/POOL)
+- 有些层包含参数，有些则不包含 (例如 CONV/FC有参数, RELU/POOL就没有)
+- 每个层可能有也可能没有额外的超参数（例如CONV / FC / POOL，RELU没有）
+- 卷积神经网络是如何工作的？
+  - 全连接层（fully connected layer）是用于连接所有神经元的层。 有时我们称之为密集（dense）层。
+    - 如果输入的维度是“（X，M）”，那么它的权重的维度将为`（NoOfHiddenNeurons，X）`。
+  - 卷积层用于提取特征，我们在这一层使用滤波器来便利图像，在不破坏图像原本信息的情况下获得一些更深层次的内容。
+    - 使用dot（点乘）来完成以下操作: `W.T*X + b`。该等式还会用到broadcasting（广播）技术。
+    - 和前文一样，我们同样需要通过计算得到 `W` 和 `b`的值。
+    - 我们通常把滤波器设置为 (`W`) 向量的形式，而非矩阵。
+  - 经过卷积层及激活层后，我们通常会得到多个特征图。
+    - 比如我有6个滤波器（filter），图片和滤波器的维度分别如下：
       - Input image                        `(32,32,3)`
       - filter size                              `(5,5,3)`
-        - We apply 6 filters. The depth must be three because the input map has depth of three.
-      - Output of Conv.                 `(28,28,6)` 
-        - if one filter it will be   `(28,28,1)`
-      - After RELU                          `(28,28,6)` 
-      - Another filter                     `(5,5,6)`
-      - Output of Conv.                 `(24,24,10)`
-  - It turns out that convNets learns in the first layers the low features and then the mid-level features and then the high level features.
-  - After the Convnets we can have a linear classifier for a classification task.
-  - In Convolutional neural networks usually we have some (Conv ==> Relu)s and then we apply a pool operation to downsample the size of the activation.
-- What is stride when we are doing convolution:
-  - While doing a conv layer we have many choices to make regarding the stride of which we will take. I will explain this by examples.
-  - Stride is skipping while sliding. By default its 1.
-  - Given a matrix with shape of `(7,7)` and a filter with shape `(3,3)`:
-    - If stride is `1` then the output shape will be `(5,5)`              `# 2 are dropped`
-    - If stride is `2` then the output shape will be `(3,3)`             `# 4 are dropped`
-    - If stride is `3` it doesn't work.
-  - A general formula would be `((N-F)/stride +1)`
-    - If stride is `1` then `O = ((7-3)/1)+1 = 4 + 1 = 5`
-    - If stride is `2` then `O = ((7-3)/2)+1 = 2 + 1 = 3`
-    - If stride is `3` then `O = ((7-3)/3)+1 = 1.33 + 1 = 2.33`        `# doesn't work`
+        - 我们使用6个滤波器。 深度（depth）必须为3，因为输入的深度为3。
+      - Conv的输出：                 `(28,28,6)` 
+        - 如果只有一个滤波器，则应为  `(28,28,1)`
+      - 经过RELU层后：                          `(28,28,6)` 
+      - 尝试这样一个滤波器                     `(5,5,6)`
+      - Conv层的输出                 `(24,24,10)`
+      - 译者注：我感觉这一部分原作者说的不是很清楚，希望读者自行查阅有关内容，这是理解卷及神经网络的关键！
+  - 事实证明，convNets在第一层学习了低级特征，然后是中级特征，最后是高级特征。（例如，低层会学到一些边边角角，然后在高层部分，这些边边角角会组成形状）
+  - 在Convnets之后，我们可以为分类任务提供一个线性分类器。
+  - 在卷积神经网络中，通常我们有一些（Conv ==> Relu），然后我们应用池（Pooling）操作来下采样（downsample）激活的大小。
+- 什么是步长（stride）？:
+  - 在做一个卷积层时，我们有时候需要采用一些不同的步长以满足我们的需求。 我将通过实例解释这一点。
+  - 步长是滤波器滑动的一次移动的长度，默认情况下是1.
+  - 有一个维度为 `(7,7)` 的矩阵和一个维度为 `(3,3)`的滤波器:
+    - 如果步长为`1`，则输出大小为`（5,5）`              `# 2 are dropped`
+    - 如果步长为`2`，则输出大小为`（3,3）`             `# 4 are dropped`
+    - 如果步长为`3`呢，后果可想而知，我们的卷积层将无法正常工作。
+  - 有如下计算公式： `((N-F)/stride +1)`
+    -  步长为`1`  `O = ((7-3)/1)+1 = 4 + 1 = 5`
+    - 步长为`2` then `O = ((7-3)/2)+1 = 2 + 1 = 3`
+    - 步长为`3` then `O = ((7-3)/3)+1 = 1.33 + 1 = 2.33`        `# doesn't work`
 
-- In practice its common to zero pad the border.   `# Padding from both sides.`
-  - Give a stride of `1` its common to pad to this equation:  `(F-1)/2` where F is the filter size
-    - Example `F = 3` ==> Zero pad with `1`
-    - Example `F = 5` ==> Zero pad with `2`
-  - If we pad this way we call this same convolution.
-  - Adding zeros gives another features to the edges thats why there are different padding techniques like padding the corners not zeros but in practice zeros works!
-  - We do this to maintain our full size of the input. If we didn't do that the input will be shrinking too fast and we will lose a lot of data.
-- Example:
-  - If we have input of shape `(32,32,3)` and ten filters with shape is `(5,5)` with stride `1` and pad `2`
-    - Output size will be `(32,32,10)`                       `# We maintain the size.`
-  - Size of parameters per filter `= 5*5*3 + 1 = 76`
-  - All parameters `= 76 * 10 = 76`
-- Number of filters is usually common to be to the power of 2.           `# To vectorize well.`
-- So here are the parameters for the Conv layer:
-  - Number of filters K.
-    - Usually a power of 2.
-  - Spatial content size F.
+- 下面再来谈一谈什么是边界（padding）   `# Padding from both sides.`
+  - 在图像的边缘填充边界可以用来保证我们输入的卷积层的图像在经过卷积后和输出的图像有着相同的大小。
+    - 例如 `F = 3` ==> 使用填充0，大小为 `1`的padding。
+    - 例如 `F = 5` ==> 使用填充0，大小为 `2`的padding。
+  - 我们称这种边界设置方法为同卷积。
+  - 为什么要填充0呢，大家可以自己动笔算一算，会发现在填充0时卷积后仍可以保留图像的局部特征。
+  - 我们这样做是为了维持输入的全部大小。 如果我们不这样做，输入将会缩小得太快，我们将丢失大量的信息。
+- 举例:
+  - 如果我们输入大小`（32,32,3）`和10个大小为`（5,5）`的过滤器，步长为`1`，边界为`2`
+    - 输出大小为 `(32,32,10)`                       `# We maintain the size.`
+  - 每个滤波器的参数为 `= 5*5*3 + 1 = 76`
+  - 共有 `= 76 * 10 = 760`
+- 滤波器的数量通常为2的幂数           `# 这是为了更好地矢量化一些参数`
+- 让我们来梳理一下卷积层都有那些参数:
+  - 滤波器数量 K。
+    - 通常为2的幂数。
+  - 滤波器的大小 F。
     - 3,5,7 ....
-  - The stride S. 
-    - Usually 1 or 2        (If the stride is big there will be a downsampling but different of pooling) 
-  - Amount of Padding
-    - If we want the input shape to be as the output shape, based on the F if 3 its 1, if F is 5 the 2 and so on.
-- Pooling makes the representation smaller and more manageable.
-- Pooling Operates over each activation map independently.
-- Example of pooling is the maxpooling.
-  - Parameters of max pooling is the size of the filter and the stride"
-    - Example `2x2` with stride `2`                     `# Usually the two parameters are the same 2 , 2`
-- Also example of pooling is average pooling.
-  - In this case it might be learnable.
+  - 步长 S. 
+    - 通常为 1 或 2        如果步长太大，这就相当于一个下采样，但是和池化层又有所不同。
+  - 边界 P
+    - 如果我们希望输入形状为输出形状，则基于F去选择。 如果 3为1，如果F为5则为2，依此类推。
+- 池化使卷积得到的特征图更小，更易于管理（你可以理解为后续处理）。
+- 池化独立操作每个激活映射。
+- 最大化池化（max pooling）：
+  - max pooling的参数是过滤器和步幅的大小
+    - 例如 `2x2` 的池化层，表示每2x2个像素就要进行一次池化操作。步长为 `2`，步长和大小通常是一样的，思考一下为什么这么做。         
+- 同样的，还有另一种池化叫平均池化（average pooling），但通常不建议这么做，因为有很多强信息可能会丢失。
+  
 
 
 
